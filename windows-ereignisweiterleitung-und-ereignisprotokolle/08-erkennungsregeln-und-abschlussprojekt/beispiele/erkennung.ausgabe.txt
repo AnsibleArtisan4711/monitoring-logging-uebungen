@@ -1,0 +1,21 @@
+
+## 1. Regeln auf 78 Ereignisse anwenden
+  R1 hoch     Serie von Anmeldefehlern von 10.66.0.99 (8 in 60 s)
+  R2 mittel   Konto gesperrt auf srv01.example.org um 10:05:50
+  R3 hoch     Überwachungsprotokoll gelöscht auf pc02.example.org um 11:30:00
+  R4 mittel   Neuer Dienst installiert auf srv01.example.org um 11:02:00
+  R5 niedrig  Neues Benutzerkonto auf srv01.example.org um 11:00:00
+
+## 2. Zusammenfassung
+  Alarme: 5 (hoch 2, mittel 2, niedrig 1)
+
+## 3. Fehlalarme prüfen: einzelne Tippfehler lösen keinen Alarm aus (2 Fehlschläge von anna und ben)
+  Alarme für anna/ben: 0
+
+## 4. Abschlussprojekt (Aufgabenliste)
+  - Eigenen Beispielbestand mit mindestens 100 Ereignissen erzeugen
+  - Abonnement-XML für zwei Kanäle schreiben und prüfen (Modul 4)
+  - Filter und Mengenabschätzung (Modul 5)
+  - Aufbewahrungsfrist und Prüfsummenliste (Modul 6)
+  - zwei eigene Regeln ergänzen und Fehlalarme prüfen
+  - Bericht mit offenen Punkten (was wurde nicht in Windows geprüft?)

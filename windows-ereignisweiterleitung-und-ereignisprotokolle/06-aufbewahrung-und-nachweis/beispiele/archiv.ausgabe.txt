@@ -1,0 +1,32 @@
+
+## 1. Tagesarchive anlegen: 10 Tage mit je einer Zeile je Ereignis (erfundene Mengen)
+2026-11-01.log
+2026-11-02.log
+2026-11-03.log
+...
+2026-11-10.log
+Dateien: 10, Zeilen gesamt: 165
+
+## 2. Aufbewahrungsfrist 7 Tage (Stichtag 2026-11-10): Trockenlauf zeigt, was gelöscht würde
+2026-11-01.log
+2026-11-02.log
+
+## 3. Prüfsummenliste anlegen, bevor gelöscht wird (Nachweis der Vollständigkeit)
+Einträge in der Liste: 10
+
+## 4. Löschen der alten Dateien und Prüfung der Restdateien
+Verbleibende Dateien: 8
+Prüfsumme OK: 8
+Datei fehlt (gelöscht nach Frist): 2
+
+## 5. Nachträgliche Änderung einer Datei wird bemerkt
+2026-11-09.log: FAILED
+
+## 6. Größenbegrenzung im Modell: Rotation bei 40 Zeilen (statt Überschreiben des ältesten Eintrags)
+aktiv.log
+aktiv.log.0
+aktiv.log.1
+Zeilen in aktiv.log: 20
+
+## 7. Hinweis
+Windows-Protokolle haben eine eigene Größenbegrenzung und Aufbewahrungsmethode je Protokoll; das Modell ersetzt keine Einstellung des Betriebssystems. Rechtliche Fristen (zum Beispiel Datenschutz, Aufbewahrungspflichten) wurden nicht geprüft.

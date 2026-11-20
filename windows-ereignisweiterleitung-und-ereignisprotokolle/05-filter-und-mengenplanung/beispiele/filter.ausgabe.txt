@@ -1,0 +1,24 @@
+
+## 1. Filtermengen im Beispielbestand (78 Ereignisse)
+  alles weiterleiten                                          78  (100 % des Bestands)
+  nur Kanal Security                                          37  ( 47 % des Bestands)
+  Sicherheitsrelevante IDs (4625, 4740, 4720, 1102, 7045)     14  ( 18 % des Bestands)
+  IDs plus erfolgreiche Anmeldungen (4624)                    26  ( 33 % des Bestands)
+
+## 2. Hochrechnung (Annahmen, keine Messung): 200 Computer, Beispielbestand = 4 Stunden von drei Computern, 1 KB je Ereignis
+  alles weiterleiten                                            31200 Ereignisse/Tag    30.5 MB/Tag   0.36 Ereignisse/s
+  nur Kanal Security                                            14800 Ereignisse/Tag    14.5 MB/Tag   0.17 Ereignisse/s
+  Sicherheitsrelevante IDs (4625, 4740, 4720, 1102, 7045)        5600 Ereignisse/Tag     5.5 MB/Tag   0.06 Ereignisse/s
+  IDs plus erfolgreiche Anmeldungen (4624)                      10400 Ereignisse/Tag    10.2 MB/Tag   0.12 Ereignisse/s
+
+## 3. Einordnung (Dokumentation: Faustregel 3000 Ereignisse je Sekunde im Mittel für einen Sammler auf gewöhnlicher Hardware)
+  Hochrechnung "alles": 0.36 Ereignisse/s = 0.01 % der Faustregel
+
+## 4. Rauschen erkennen: häufigste IDs, die nicht sicherheitsrelevant sind
+  ID  1000: 10 Ereignisse
+  ID    37: 10 Ereignisse
+  ID  1001: 10 Ereignisse
+  ID  1002: 10 Ereignisse
+
+## 5. Hinweis
+  Die Hochrechnung nimmt gleiche Raten für alle Computer an; echte Raten schwanken stark. Zahlen vor der Planung messen.

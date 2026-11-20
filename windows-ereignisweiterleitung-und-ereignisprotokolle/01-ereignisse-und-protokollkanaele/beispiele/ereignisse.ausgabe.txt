@@ -1,0 +1,34 @@
+
+## 1. Ein Ereignis im Aufbau (System-Teil und Nutzdaten), ein erfundenes Anmeldeereignis
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event"><System><Provider Name="Microsoft-Windows-Security-Auditing"/><EventID>4625</EventID><Level>0</Level><TimeCreated SystemTime="2026-12-01T09:20:00.000Z"/><EventRecordID>11</EventRecordID><Channel>Security</Channel><Computer>pc01.example.org</Computer></System><EventData><Data Name="TargetUserName">anna</Data><Data Name="LogonType">2</Data><Data Name="IpAddress">-</Data><Data Name="Status">0xC000006D</Data></EventData></Event>
+
+
+## 2. Ereignisse je Kanal und Computer
+Ereignisse gesamt: 78
+  Application   30
+  Security      37
+  System        11
+  pc01.example.org    26
+  pc02.example.org    31
+  srv01.example.org   21
+
+## 3. Ereignis-IDs im Datenbestand (Anzahl)
+     37  10
+   1000  10
+   1001  10
+   1002  10
+   1102   1
+   4624  12
+   4625  10
+   4634  12
+   4720   1
+   4740   1
+   7045   1
+
+## 4. Bedeutung einiger IDs (laut Microsoft-Dokumentation: 4624, 4625, 4634, 4740, 1102 in Suchauszügen gelesen; 4720 und 7045 aus Fachwissen)
+4624 erfolgreiche Anmeldung     4625 fehlgeschlagene Anmeldung     4634 Abmeldung
+4740 Konto gesperrt             4720 Benutzerkonto erstellt        1102 Überwachungsprotokoll gelöscht
+7045 Dienst installiert (System-Protokoll)
+
+## 5. Hinweis
+Reale Windows-Ereignisse haben mehr Felder; der Aufbau hier ist vereinfacht und nicht gegen das Ereignisschema geprüft.

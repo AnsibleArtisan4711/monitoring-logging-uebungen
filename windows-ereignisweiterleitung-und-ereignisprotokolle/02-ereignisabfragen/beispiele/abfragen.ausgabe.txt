@@ -1,0 +1,36 @@
+
+## 1. Nach Ereignis-ID: *[System[(EventID=4625)]]
+Treffer: 10
+  09:20:00 pc01.example.org    4625 anna
+  09:41:00 pc01.example.org    4625 ben
+  10:05:00 srv01.example.org   4625 cara
+
+## 2. ID-Liste mit oder: Anmeldung gescheitert oder Konto gesperrt
+Treffer: 11
+  09:20:00 pc01.example.org    4625 anna
+  09:41:00 pc01.example.org    4625 ben
+  10:05:00 srv01.example.org   4625 cara
+
+## 3. Nach Computer: *[System[Computer='srv01.example.org']]
+Treffer: 21
+  08:00:00 srv01.example.org   1000 
+  08:22:00 srv01.example.org   1002 
+  09:01:00 srv01.example.org   1002 
+
+## 4. Kombination: Anmeldefehler auf srv01 UND Benutzer cara (Nutzdaten)
+Treffer: 8
+  10:05:00 srv01.example.org   4625 cara
+  10:05:05 srv01.example.org   4625 cara
+  10:05:10 srv01.example.org   4625 cara
+
+## 5. Zeitraum: XPath 1.0 vergleicht keine Zeichenketten mit < und >, der Ausdruck liefert im Modell keine Treffer
+Treffer: 0
+Deshalb wird der Zeitraum im Modell in Python geprüft (zeit(e) als Text, gleiche Form):
+Treffer: 10 (IDs [37, 1000, 1001, 1002, 1102, 4720, 7045])
+Windows kennt für Zeiträume die Funktion timediff (Fachwissen, nicht geprüft).
+
+## 5b. Nach Stufe: Level=4 (laut Fachwissen: Information)
+Treffer: 32
+
+## 6. Mit wevtutil (Text, nicht ausgeführt, Befehl aus Fachwissen)
+wevtutil qe Security /q:"*[System[(EventID=4625)]]" /c:5 /f:text

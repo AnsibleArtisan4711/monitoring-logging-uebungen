@@ -1,0 +1,24 @@
+
+## 1. Umgesetzte Ereignisse: 14, Beispiele
+  <37>1 2026-12-01T09:20:00Z pc01.example.org Microsoft-Windows-Security-Auditing - 4625 [daten TargetUserName="anna" LogonType="2" IpAddress="-" Status="0xC000006D"] 
+  <37>1 2026-12-01T09:41:00Z pc01.example.org Microsoft-Windows-Security-Auditing - 4625 [daten TargetUserName="ben" LogonType="2" IpAddress="-" Status="0xC000006D"] 
+  <37>1 2026-12-01T11:00:00Z srv01.example.org Microsoft-Windows-Security-Auditing - 4720 [daten TargetUserName="dora" SubjectUserName="admin1"] 
+  <30>1 2026-12-01T11:02:00Z srv01.example.org Service_Control_Manager - 7045 [daten ServiceName="BeispielDienst" ImagePath="C:\Beispiel\dienst.exe"] 
+  <38>1 2026-12-01T11:30:00Z pc02.example.org Microsoft-Windows-Eventlog - 1102 [daten SubjectUserName="admin1"] 
+
+## 2. Priorität = Facility x 8 + Schweregrad (Beispiel Sicherheitsprotokoll, Level 0)
+  4 x 8 + 5 = 37
+
+## 3. Wieder einlesen: Aufbau prüfen
+  Zeilen: 14, Aufbau stimmt: 14
+
+## 4. Auswertung auf Syslog-Seite: Zeilen je Anwendungsname (Quelle)
+  Microsoft-Windows-Security-Auditing  12
+  Service_Control_Manager              1
+  Microsoft-Windows-Eventlog           1
+
+## 5. Verlust beim Umsetzen
+  Der Syslog-Text enthält nur die gewählten Felder (Zeit, Computer, Quelle, ID, Nutzdaten); Felder wie EventRecordID und Kanal gehen verloren.
+
+## 6. Weiterleitung (nur Text)
+Für die Weiterleitung von Windows-Ereignissen an Syslog-Server gibt es Zusatzprogramme; kein Produkt wurde ausgeführt, keine Version und kein Lizenzmodell wurden geprüft.

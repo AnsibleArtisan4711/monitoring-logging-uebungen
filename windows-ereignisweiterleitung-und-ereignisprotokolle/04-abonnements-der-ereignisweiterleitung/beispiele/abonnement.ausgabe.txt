@@ -1,0 +1,25 @@
+
+## 1. Wohlgeformtheit (xmllint) und Wurzel
+wohlgeformt
+Subscription
+
+
+## 2. Aufbau prüfen und die Abfrage gegen die Beispielereignisse laufen lassen
+Typ: SourceInitiated | Id: Beispiel-Anmeldefehler | Protokoll: http | Zielprotokoll: ForwardedEvents
+Abfrage: Kanal Security, Ausdruck *[System[(EventID=4625)]]
+Prüfung: ok
+Treffer im Beispielbestand: 10
+
+## 3. Fehlerfall: Quellenliste bei einem SourceInitiated-Abonnement
+Abfrage: Kanal Security, Ausdruck *[System[(EventID=4625)]]
+Prüfung: 1 Fehler
+  - SourceInitiated hat keine EventSources
+
+## 4. Einrichtung (Text; Befehle laut Microsoft-Dokumentation, nicht ausgeführt)
+Quelle   : winrm qc -q ;  Gruppenrichtlinie SubscriptionManager (Computer Configuration > Administrative Templates > Windows Components > Event Forwarding) ;  gpupdate /force
+Sammler  : winrm qc -q ;  wecutil qc /q ;  wecutil cs abo.xml
+Prüfung  : wecutil gr Beispiel-Anmeldefehler ;  wecutil gs Beispiel-Anmeldefehler ;  Protokoll ForwardedEvents lesen
+Sicherheitsprotokoll weiterleiten: das Konto NETWORK SERVICE in die Gruppe Event Log Readers aufnehmen
+
+## 5. Zwei Arten (Dokumentation)
+Collector-initiated: das Abonnement listet alle Quellen. Source-initiated: Quellen melden sich selbst (per Gruppenrichtlinie); Zugriff je Abonnement über SDDL-Liste (hier der Standard für Domänencomputer).

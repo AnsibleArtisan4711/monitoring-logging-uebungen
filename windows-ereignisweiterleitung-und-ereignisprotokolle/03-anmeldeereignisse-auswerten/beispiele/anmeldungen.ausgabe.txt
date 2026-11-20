@@ -1,0 +1,23 @@
+
+## 1. Erfolgreiche und fehlgeschlagene Anmeldungen je Benutzer
+  anna  erfolgreich  2  fehlgeschlagen  1
+  ben   erfolgreich  3  fehlgeschlagen  1
+  cara  erfolgreich  7  fehlgeschlagen  8
+
+## 2. Fehlschläge nach Anmeldetyp (2 = interaktiv, 3 = Netzwerk: laut Fachwissen)
+  Typ 2: 2
+  Typ 3: 8
+
+## 3. Fehlschläge nach Quelladresse
+  10.66.0.99   8
+  -            2
+
+## 4. Verdacht: mindestens 5 Fehlschläge derselben Adresse innerhalb von 60 Sekunden
+  -            Höchstwert in 60 s: 1 -> unauffällig
+  10.66.0.99   Höchstwert in 60 s: 8 -> VERDACHT
+
+## 5. Konto gesperrt (4740): Zeitpunkt nach dem letzten Fehlschlag?
+  Sperre von cara auf srv01.example.org, 15 s nach dem letzten Fehlschlag
+
+## 6. Hinweis
+  Schwelle (5 in 60 s) und Zeitfenster sind Beispielwerte, keine Empfehlung.
