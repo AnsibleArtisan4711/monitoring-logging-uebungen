@@ -1,0 +1,36 @@
+
+## 1. Host-Gruppe und Host anlegen (Agent-Schnittstelle 127.0.0.1:11050)
+Host: lin01 (Linux-Server 01), Status 0 (0 = überwacht), Schnittstelle 127.0.0.1:11050, Gruppe Uebung-Linux
+
+## 2. Items anlegen: Schlüssel, Datentyp und Intervall
+  agent.ping	Typ 3	Intervall 2s	Agent erreichbar
+  kein.schluessel	Typ 3	Intervall 2s	Fehlerhafter Schlüssel
+  system.cpu.load[all,avg1]	Typ 0	Intervall 2s	Last (1 Minute)
+  uebung.warteschlange	Typ 3	Intervall 2s	Warteschlange
+(value_type: 0 = Fließkomma, 3 = ganze Zahl ohne Vorzeichen)
+
+## 3. Erste Werte treffen ein; das Item mit dem falschen Schlüssel wird „nicht unterstützt“
+agent.ping = 1
+uebung.warteschlange = 10
+system.cpu.load[all,avg1] liefert einen Wert: ja
+kein.schluessel: state=1 (1 = nicht unterstützt), Fehler: Unsupported item key.
+
+## 4. Trigger mit Ausdruck und Wiederherstellungsausdruck (Hysterese)
+Trigger: Warteschlange zu lang
+  Problem ab:  last(/lin01/uebung.warteschlange)>100
+  Erholt bei:  last(/lin01/uebung.warteschlange)<50
+  Priorität 3 (3 = Durchschnitt), Wert 0 (0 = OK)
+Trigger mit falschem Ausdruck:
+  API-FEHLER trigger.create: Incorrect item key "gibt.es.nicht" provided for trigger expression on "lin01".
+  API-FEHLER trigger.create: Invalid parameter "/1/expression": incorrect expression starting from "last(/lin01/uebung.warteschlange>1".
+
+## 5. Ablauf: Wert 150 -> Problem; 70 -> bleibt Problem (Hysterese); 20 -> OK
+Wert 150: Trigger = PROBLEM
+Aktives Problem: Warteschlange zu lang (Schweregrad 3)
+Wert 70: Trigger-Wert = 1 (1 = Problem bleibt, weil 70 nicht unter 50 liegt)
+Wert 20: Trigger = OK
+
+## 6. Ereignisverlauf (Tabelle events): Problem und Wiederherstellung
+  PROBLEM
+  OK
+Problem-Einträge jetzt offen: 0

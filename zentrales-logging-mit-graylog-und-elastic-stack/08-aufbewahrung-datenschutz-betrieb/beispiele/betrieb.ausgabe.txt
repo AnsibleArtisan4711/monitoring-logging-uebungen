@@ -1,0 +1,52 @@
+
+## 1. Rotation mit logrotate: bis zu 3 alte Dateien, komprimiert, Rotation erzwungen (4-mal)
+Dateien: app.log.1.gz app.log.2.gz app.log.3.gz 
+Älteste noch vorhandene Datei enthält: Inhalt Lauf 2  (Lauf 1 ist gelöscht)
+Trockenlauf (-d): zeigt, was logrotate tun würde, ohne etwas zu ändern (Auszug):
+rotating pattern: …/app/app.log  1048576 bytes (3 rotations)
+considering log …/app/app.log
+Fehlerbild: unbekannte Direktive:
+error: …/kaputt.conf:2 unknown option 'rotiere' -- ignoring line
+
+## 2. Aufbewahrungsfrist: Dateien älter als 30 Tage finden (Trockenlauf) und löschen
+Treffer (älter als 30 Tage):
+  log-vor-31-tagen.gz
+  log-vor-45-tagen.gz
+  log-vor-90-tagen.gz
+Übrig: log-vor-20-tagen.gz log-vor-5-tagen.gz 
+
+## 3. Pseudonymisierung: Adressen und Benutzer durch einen Schlüssel-Hash ersetzen (gleiche Eingabe gleicher Wert)
+  Adressen im Bestand: 11; gleiche Adresse, gleicher Wert: True
+  verschiedene Adressen, verschiedene Werte: True; anderer Schlüssel, anderer Wert: True
+  Auswertung bleibt möglich: 1 Pseudonym für alle 40 Fehlschläge der Angriffsquelle
+  Beispiel: {"ip": "p_881d039c9a", "benutzer": "p_f53f697fd5"}
+
+## 4. Anonymisierung beim Empfang: rsyslog-Modul mmanon setzt die letzten 8 Bit einer IPv4-Adresse auf 0
+rsyslogd: End of config validation run. Bye.
+  DENY tcp 10.18.0.0 -> 10.18.0.0:22
+  Failed password for ben from 10.18.0.0 port 51234 ssh2
+
+## 5. Unverändertheit nachweisen: Hash-Kette (jede Zeile enthält den Hash der vorigen) und Manipulation erkennen
+  Kette über 1000 Zeilen, letzter Hash beginnt mit ee63e142fa59
+  Eine einzige Zeile (Nr. 500) geändert: erste abweichende Prüfsumme ab Zeile 500; Zeilen davor unverändert: True
+  Auch der Endhash ändert sich: True
+  sha256sum der Logdatei (Dateinachweis): 277a5f6d168e88d3…
+
+## 6. Speicherbedarf abschätzen aus dem gemessenen Mittel einer Zeile
+  Bestand: 2721 Ereignisse, 703 KiB, im Mittel 265 Byte je Ereignis
+  Annahme: 100 Rechner mit je 907 Ereignissen am Tag (Bestand geteilt durch seine 3 Rechner), 90 Tage Aufbewahrung, Verdichtung auf 10 % (Annahme)
+  Rohdaten je Tag: 24.0 MB; für 90 Tage roh: 2.2 GB; mit Verdichtung: 0.22 GB (ohne Index und Replikate)
+
+## 7. Datenschutz-Inventur: welche Felder können Personen betreffen? (Einordnung als Annahme; keine Rechtsberatung, nicht geprüft)
+  benutzer   in  171 Ereignissen: Benutzername
+  ip         in 2321 Ereignissen: IP-Adresse (kann personenbezogen sein)
+  quelle     in  400 Ereignissen: IP-Adresse
+  nachricht  in 2721 Ereignissen: Freitext (kann beides enthalten)
+
+## 8. Abschlussprojekt – Abnahmeprüfung (je Prüfpunkt OK/FEHLER)
+OK      rsyslog-Konfiguration gültig
+OK      Empfang und Anonymisierung vorhanden
+OK      Rotation hat 3 alte Dateien behalten
+OK      Aufbewahrung: nichts über 30 Tage übrig
+OK      Logdatei hat Nachweis-Hash
+FEHLER  absichtlich falsch: Datei fehlt

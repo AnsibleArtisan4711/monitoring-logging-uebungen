@@ -1,0 +1,65 @@
+
+## 1. Regeldatei prüfen (promtool check rules)
+$ promtool check rules /tmp/p18/alarme.yml
+Checking /tmp/p18/alarme.yml
+  SUCCESS: 3 rules found
+
+
+## 2. Regeltest mit erfundenen Reihen (promtool test rules): HostDown und Plattenprognose
+$ promtool test rules alarme_test.yml
+Unit Testing:  alarme_test.yml
+  SUCCESS
+
+
+## 3. Derselbe Test mit falscher Erwartung (HostDown schon nach 4 Minuten) schlägt fehl
+Unit Testing:  alarme_test_falsch.yml
+  FAILED:
+    alertname: HostDown, time: 4m, 
+        exp:[
+            0:
+              Labels:{alertname="HostDown", instance="srv02:9100", job="node", severity="critical", team="infra"}
+              Annotations:{}
+            ], 
+        got:[]
+
+
+Rückgabecode 1
+
+## 4. Alertmanager-Konfiguration: Routing nach Schweregrad, Hemmung, Webhook
+$ amtool check-config /tmp/p18/am.yml
+Checking '/tmp/p18/am.yml'  SUCCESS
+Found:
+ - global config
+ - route
+ - 1 inhibit rules
+ - 2 receivers
+ - 0 templates
+
+$ amtool config routes show
+Routing tree:
+.
+└── default-route  receiver: standard
+    └── {severity="critical"}  receiver: bereitschaft
+
+$ amtool config routes test severity=critical
+bereitschaft
+$ amtool config routes test severity=warning
+standard
+$ amtool config routes test alertname=HighCpu
+standard
+
+## 5. Alertmanager und Webhook starten; Alarme senden (amtool alert add)
+Benachrichtigungen im Webhook (sortiert):
+status=firing receiver=bereitschaft group={"alertname": "HostDown"} alerts=HostDown@srv02
+status=firing receiver=standard group={"alertname": "HighCpu"} alerts=HighCpu@srv01
+
+## 6. Warnungen derselben Instanz werden durch die kritische Meldung gehemmt (inhibited); aktive Alarme
+Unterdrückt (inhibited):
+  DiskWillFillIn4h@srv02  Zustand: suppressed
+Aktiv (nicht unterdrückt):
+  HighCpu@srv01  Zustand: active
+  HostDown@srv02  Zustand: active
+
+## 7. Stummschaltung (silence): HostDown für srv01 wird nicht gemeldet
+Webhook-Einträge nach der Stummschaltung: 0
+Stummschaltung: alertname=HostDown,instance=srv01 Kommentar=Wartung Status=active

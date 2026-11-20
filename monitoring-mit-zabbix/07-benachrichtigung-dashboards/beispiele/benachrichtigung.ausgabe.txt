@@ -1,0 +1,29 @@
+
+## 1. Medientyp „Skript“ anlegen und dem Benutzer Admin zuordnen
+Medientyp Datei-Skript, Typ 1 (1 = Skript), Skript meldung.sh
+Benutzer Admin: Empfänger bereitschaft, Schweregrade-Maske 63, Zeitraum 1-7,00:00-24:00
+
+## 2. Host, Trigger und Aktion (Problem ab Durchschnitt: Nachricht; Wiederherstellung: Nachricht)
+Aktion Probleme melden: Quelle 0 (0 = Trigger), Bedingung Schweregrad >= 3, 1 Operation, 1 Wiederherstellungsoperation
+
+## 3. Problem löst Benachrichtigung aus, Wiederherstellung ebenfalls
+Meldungen im Skript-Protokoll: 1
+  AN=bereitschaft | BETREFF=PROBLEM: Warteschlange zu lang
+Meldungen nach der Wiederherstellung: 2
+  AN=bereitschaft | BETREFF=OK: Warteschlange zu lang
+Tabelle alerts (Status 1 = gesendet): 1 1 
+
+## 4. Wartungsfenster (mit Datensammlung): Problem entsteht, wird unterdrückt, keine Meldung; nach Löschen des Fensters kommt sie
+Host im Wartungsmodus (maintenance_status = 1): 1
+Problem unterdrückt: Warteschlange zu lang, suppressed=1
+Neue Meldungen während der Wartung: 0
+Nach dem Löschen des Fensters: suppressed=0, neue Meldungen: 1
+
+## 5. Fehlerbild: Medientyp mit nicht vorhandenem Skript
+Fehlgeschlagene Meldung (status 2): Cannot execute command "…/alertscripts/gibts-nicht.sh": [2] No such file or directory
+
+## 6. Dashboard über die API anlegen (nur Anlage geprüft, die Darstellung im Browser nicht)
+Dashboard angelegt: ID vorhanden = true
+Dashboard Uebung Betrieb: Widgets problems, clock
+Fehlerbild: Widget außerhalb des Rasters (Breite 100):
+  API-FEHLER dashboard.create: Invalid parameter "/1/pages/1/widgets/1/width": value must be one of 1-72.

@@ -1,0 +1,37 @@
+
+## 1. Die Stufen (Stand 20.11.2026, Handbuchseite Available Licenses)
+  Test      : 30 Tage, unbegrenzt viele Sensoren, alle Sensorarten
+  Freeware  : bis 100 Sensoren, alle Sensorarten, für private und gewerbliche Nutzung; nach dem Test fällt PRTG auf diese Stufe zurück
+  Kommerziell: Sensorzahl nach Lizenz (genaue Zahlen und Preise: nicht bestätigt, Herstellerportal)
+  Offen      : was bei Überschreitung genau passiert (Sensoren pausiert? Ablehnung?) - nicht bestätigt, vor dem Einsatz nachlesen
+
+## 2. Ende des Tests berechnen (Installation am 2026-11-20, 30 Tage) und Restzeit zu einem Prüftag
+  Testende (Installationstag + 30 Tage, genaue Zählweise nicht bestätigt): 2026-12-20
+  am 2026-12-01: noch 19 Tag(e) Test
+  am 2026-12-19: noch 1 Tag(e) Test
+  am 2026-12-21: Test vorbei -> Freeware, höchstens 100 Sensoren
+
+## 3. Sensorbudget planen: Zielzustand mit Ampel (grün bis 80, gelb bis 100, rot darüber; Ampelgrenzen sind Übungswerte)
+  Kerngeräte (Ping+SNMP kompakt)              22   Summe  22
+  Server (6 Sensoren je Server, 8 Server)     48   Summe  70
+  Webdienste (HTTP, Port)                     12   Summe  82
+  Eigene Skripte                               8   Summe  90
+  gesamt 90 von 100 -> gelb; freie Reserve 10
+  mit 2 weiteren Servern (je 6): rot (102 Sensoren)
+
+## 4. Sicherung (Modell): Konfigurationsordner mit tar sichern, Prüfsumme, Wiederherstellung, Vergleich
+konfig/
+konfig/sensor1.cfg
+konfig/sensor2.cfg
+konfig/sensor3.cfg
+Wiederherstellung: Prüfsummen gleich
+Hinweis: Ort der echten PRTG-Daten und die Sicherungsfunktion von PRTG: nicht bestätigt; Konfiguration und Datenordner getrennt sichern.
+
+## 5. Abnahmeliste (eine Zeile ist absichtlich ein FEHLER)
+  OK     Web-Oberfläche per HTTPS erreichbar
+  OK     Testmail zugestellt
+  OK     Sensorzahl <= 100
+  OK     Abhängigkeit Switch -> Server gesetzt
+  OK     Eigener Skriptsensor liefert gültiges XML
+  FEHLER Sicherung der Konfiguration wiederhergestellt und geprüft
+  Ergebnis: 5 von 6 bestanden

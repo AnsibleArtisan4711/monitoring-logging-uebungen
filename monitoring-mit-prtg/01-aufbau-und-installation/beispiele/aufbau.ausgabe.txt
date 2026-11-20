@@ -1,0 +1,25 @@
+
+## 1. Bausteine und Wege (Modell der Architektur; Namen nach Lehrplan, Hersteller-Details nicht geprüft)
+  Browser (Web-Oberfläche)     --HTTPS                                 --> PRTG Core Server
+  PRTG Core Server             --TCP, Standard 23560 (nicht bestätigt) --> Probe (lokal oder remote)
+  Probe                        --SNMP/WMI/SSH/HTTP/Ping                --> überwachtes Gerät
+  PRTG Core Server             --SMTP                                  --> Mailserver (Benachrichtigung)
+  Sensoren laufen auf der Probe; Konfiguration und Messdaten liegen auf dem Core Server.
+
+## 2. Vorabprüfung des Servers (Übungsschwellen: 8 GB RAM, 60 GB frei, 64-Bit-Windows; Ports 80 und 443 frei)
+  Labor-VM ok              -> OK
+  zu wenig RAM             -> FEHLER: RAM 4 GB < 8 GB
+  Linux-VM                 -> FEHLER: Betriebssystem Ubuntu 24.04: PRTG braucht Windows
+  Port 443 belegt (IIS)    -> FEHLER: Port 443 belegt
+
+## 3. Echte Prüfung auf diesem Rechner: ist Port 443 und Port 23560 auf 127.0.0.1 frei? (frei = Verbindung abgelehnt)
+  127.0.0.1:443 -> frei
+  127.0.0.1:23560 -> frei
+
+## 4. Reihenfolge der Installation (Checkliste, nicht ausgeführt)
+  1. VM am privaten Switch (Hyper-V) mit fester Adresse, Namensauflösung, Zeit (NTP) prüfen
+  2. Installationsprogramm von der Herstellerseite laden, Prüfsumme/Signatur prüfen (Quelle und Version notieren)
+  3. Installieren, Administrator-Kennwort setzen, Web-Oberfläche per HTTPS aufrufen
+  4. Lizenz prüfen: Test 30 Tage, danach Freeware bis 100 Sensoren (Stand 20.11.2026, Handbuchseite Available Licenses)
+  5. Mail-Server (SMTP) für Benachrichtigungen eintragen und Testmail senden
+  6. Erstes Gerät anlegen, Sensorzahl vorher planen (Modul 2 und 8)

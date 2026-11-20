@@ -1,0 +1,72 @@
+
+## 1. Versionen der Bausteine
+Server: zabbix_server (Zabbix) 7.0.32
+Agent:  zabbix_agentd (daemon) (Zabbix) 7.0.32
+API:    "7.0.32"
+Datenbank: 16 (PostgreSQL, Hauptversion)
+
+## 2. Prozesse des Servers (Anzahl je Art); die Pollerzahl steht in der Konfiguration
+  1  agent poller
+  1  alert manager
+  1  alert syncer
+  3  alerter
+  1  availability manager
+  1  browser poller
+  1  configuration syncer
+  1  configuration syncer worker
+  1  discovery manager
+  1  escalator
+  1  ha manager
+  5  history poller
+  4  history syncer
+  1  housekeeper
+  1  http agent poller
+  1  http poller
+  1  icmp pinger
+  1  internal poller
+  1  lld manager
+  2  lld worker
+  1  odbc poller
+  2  poller
+  1  preprocessing manager
+  1  proxy group manager
+  1  proxy poller
+  1  self-monitoring
+  1  service manager
+  1  snmp poller
+  1  task manager
+  1  timer
+StartPollers=2 StartPingers=1 StartTrappers=2 StartDiscoverers=1 
+
+## 3. Passive Prüfung: der Server fragt den Agenten (zabbix_get ahmt das nach)
+agent.ping       -> 1
+agent.hostname   -> lin01
+agent.version    -> 7.0.32
+unbekannter Schlüssel -> ZBX_NOTSUPPORTED: Unsupported item key.
+
+## 4. Aktive Prüfung: der Agent fragt den Server; unbekannter Host wird abgelehnt (Protokoll des Servers)
+host [lin01] not found
+
+## 5. Datenmodell: Tabellen und Inhalt der frisch eingespielten Datenbank
+Tabellen im Schema public: 203
+Zeilen in hosts nach Art (nur echte Einträge; status 0 = überwacht, 1 = nicht überwacht, 3 = Vorlage):
+  status 1: 1
+  status 3: 356
+  hstgrp      19
+  items       18388
+  triggers    6881
+  actions     5
+  media_type  39
+  users       2
+  dashboard   357
+Tabellen für Messwerte (leer, solange keine Textwerte, Protokolle und Ereignisse anfallen):
+  history_text  0
+  history_log   0
+  trends        0
+  trends_uint   0
+
+## 6. Wichtige Objekte über die API: Gruppen, Vorlagen, Benutzer
+Host-Gruppen: Applications; Databases; Discovered hosts; Hypervisors; Linux servers; Virtual machines; Zabbix servers
+Vorlagen gesamt: 356
+Vorlage gefunden: Linux by Zabbix agent
+Benutzer: Admin, guest

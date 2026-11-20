@@ -1,0 +1,62 @@
+
+## 1. Instant Vector und Label-Filter
+$ up
+instance=srv01:9100,job=node	1
+instance=srv02:9100,job=node	0
+instance=win01:9182,job=windows	1
+$ up{job="node"}
+instance=srv01:9100,job=node	1
+instance=srv02:9100,job=node	0
+$ up{instance=~"srv.*"} == 0
+instance=srv02:9100,job=node	0
+
+## 2. Zähler: rate() über 5 Minuten, Summen nach Labels
+$ rate(node_cpu_seconds_total{mode="idle"}[5m])
+cpu=0,instance=srv01:9100,job=node,mode=idle	0.822
+cpu=0,instance=srv02:9100,job=node,mode=idle	0.153
+$ sum by (instance) (rate(node_cpu_seconds_total{mode!="idle"}[5m]))
+instance=srv01:9100	0.178
+instance=srv02:9100	0.847
+
+## 3. CPU-Auslastung in Prozent und Speicher belegt in Prozent
+$ 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])))
+instance=srv01:9100	17.829
+instance=srv02:9100	84.66
+$ 100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+instance=srv01:9100,job=node	44.929
+instance=srv02:9100,job=node	89.872
+
+## 4. Plattenplatz: Prognose mit predict_linear (Stunden bis voll)
+$ 100 * (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})
+instance=srv01:9100,job=node,mountpoint=/	44.8
+instance=srv02:9100,job=node,mountpoint=/	81.6
+$ predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[1h], 4*3600) < 0
+instance=srv02:9100,job=node,mountpoint=/	-26628797235.647
+$ node_filesystem_avail_bytes{mountpoint="/"} / -deriv(node_filesystem_avail_bytes{mountpoint="/"}[1h]) / 3600
+instance=srv01:9100,job=node,mountpoint=/	23
+instance=srv02:9100,job=node,mountpoint=/	1.704
+
+## 5. Anwendung: Fehlerquote und 95. Perzentil der Antwortzeit (Histogramm)
+$ sum by (code) (rate(http_requests_total[5m]))
+code=200	7.883
+code=404	0.267
+code=500	0.44
+$ sum(rate(http_requests_total{code=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+(ohne Labels)	0.051
+$ histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))
+(ohne Labels)	0.973
+$ histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m] offset 1h)))
+(ohne Labels)	0.247
+
+## 6. Auswahl und Vergleich
+$ topk(1, 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))))
+instance=srv02:9100	84.66
+$ count(up == 0)
+(ohne Labels)	1
+$ avg_over_time(node_memory_MemAvailable_bytes{instance="srv01:9100"}[30m]) / 1024^3
+instance=srv01:9100,job=node	4.402
+$ absent(up{job="windows",instance="win02:9182"})
+instance=win02:9182,job=windows	1
+
+## 7. Bereichsabfrage: wie viele Messpunkte liefert ein Zeitraum von 10 Minuten bei Schritt 60 s?
+Punkte: 11

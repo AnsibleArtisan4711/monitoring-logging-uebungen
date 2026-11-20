@@ -1,0 +1,25 @@
+
+## 1. Baum: Internet-Router -> Firewall -> Switch -> zwei Server -> deren Dienste
+  Router
+    Firewall
+      Switch
+        srv01
+          HTTP srv01
+        srv02
+          SQL srv02
+  Zyklus vorhanden: False
+
+## 2. Ausfall des Switches: gemeldet wird nur der Switch, alles darunter ist pausiert
+  gemeldet Down: ['Switch']
+  pausiert     : ['HTTP srv01', 'SQL srv02', 'srv01', 'srv02']
+  ohne Abhängigkeiten: 5 Meldungen; mit: 1 Meldung
+
+## 3. Nur ein Dienst fällt aus (HTTP srv01): nichts wird pausiert
+   (['HTTP srv01'], [])
+
+## 4. Zyklus: A hängt von B ab und B von A - wird erkannt (in PRTG verhindern, nicht bestätigt, wie es sich verhält)
+  Zyklus A<->B: True | Kette A->B->C: False
+
+## 5. Falle: der Elternsensor passt nicht zur Wirklichkeit (srv01 hängt in PRTG an der Firewall, ist aber noch über einen zweiten Weg erreichbar)
+  Firewall fällt aus, srv01 ist über einen zweiten Weg erreichbar -> Modell sagt: (['Firewall'], ['srv01'])
+  Folge: ein echter Ausfall von srv01 bleibt unsichtbar, solange die Firewall Down ist (pausiert = nicht geprüft)

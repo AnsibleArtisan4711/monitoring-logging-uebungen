@@ -1,0 +1,27 @@
+
+## 1. Konfiguration prüfen (promtool check config)
+$ promtool check config /tmp/p18/prometheus.yml
+Checking /tmp/p18/prometheus.yml
+ SUCCESS: /tmp/p18/prometheus.yml is valid prometheus config file syntax
+
+
+## 2. Eine fehlerhafte Konfiguration (Einrückung) wird gemeldet
+$ promtool check config /tmp/p18/kaputt.yml
+Checking /tmp/p18/kaputt.yml
+  FAILED: parsing YAML file /tmp/p18/kaputt.yml: yaml: line 6: could not find expected ':'
+
+rc=1
+
+## 3. Prometheus starten, kurz warten, Ziele abfragen (Zustand und Labels)
+node	up	test	uebung
+prometheus	up	-	-
+
+## 4. Die Abfrage up und die Selbstbeschreibung (external_labels erscheinen nur bei Weitergabe, nicht in der Abfrage)
+instance=127.0.0.1:19090,job=prometheus	1
+instance=127.0.0.1:19100,job=node,rolle=test,umgebung=uebung	1
+
+## 5. Neues Ziel per Datei (file_sd): node_exporter ein zweites Mal als Ziel unter anderem Namen eintragen, ohne Neustart
+datei-ziel	localhost:19100	up
+
+## 6. Zeitreihen im Speicher des Kopfblocks (prometheus_tsdb_head_series > 0)
+instance=127.0.0.1:19090,job=prometheus	1

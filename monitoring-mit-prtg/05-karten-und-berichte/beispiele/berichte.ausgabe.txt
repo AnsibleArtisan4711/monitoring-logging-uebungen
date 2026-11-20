@@ -1,0 +1,27 @@
+
+## 1. Verfügbarkeit je Sensor für eine Woche (604800 s) aus der erfundenen Ausfallliste
+  Ping srv01    100.000 %   Ausfälle 0   mittlere Dauer 0 s
+  HTTP srv01     99.563 %   Ausfälle 3   mittlere Dauer 880 s
+  Ping fw01      99.950 %   Ausfälle 1   mittlere Dauer 300 s
+  Ping sw01     100.000 %   Ausfälle 0   mittlere Dauer 0 s
+  SNMP srv02     98.214 %   Ausfälle 2   mittlere Dauer 5400 s
+
+## 2. Was 99,9 % in einer Woche bedeutet, und wer die Zielmarke 99,9 % verfehlt
+  99,9 % erlauben 604.8 s Ausfall pro Woche
+  verfehlen die Marke: ['HTTP srv01', 'SNMP srv02']
+
+## 3. Bericht als Tabelle (CSV) und als Zeilen, sortiert nach Ausfalldauer
+  SNMP srv02    10800 s  2 Ausfälle
+  HTTP srv01     2640 s  3 Ausfälle
+  Ping fw01       300 s  1 Ausfälle
+  Ping sw01         0 s  0 Ausfälle
+  Ping srv01        0 s  0 Ausfälle
+
+## 4. Karte (Modell): eine SVG mit einem Kästchen je Gerät, Farbe nach Status; mit xmllint auf Wohlgeformtheit geprüft
+$ xmllint --noout /tmp/p20/karte.svg
+Rückgabewert xmllint: 0
+Kästchen: 5, davon rot: 1
+
+## 5. Eine kaputte Karte wird erkannt (nicht geschlossenes Tag)
+kaputt.svg:14: parser error : Premature end of data in tag svg line 2
+

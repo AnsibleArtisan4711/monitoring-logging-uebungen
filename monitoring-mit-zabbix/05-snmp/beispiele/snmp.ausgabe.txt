@@ -1,0 +1,39 @@
+
+## 1. SNMP von Hand prüfen (snmpget, snmpwalk), bevor Zabbix es nutzt
+$ snmpget -v2c -c uebung -On 127.0.0.1:11161 1.3.6.1.2.1.1.5.0
+.1.3.6.1.2.1.1.5.0 = STRING: "lin-snmp01"
+$ snmpget -v2c -c uebung -On 127.0.0.1:11161 1.3.6.1.2.1.1.4.0 1.3.6.1.2.1.1.6.0
+.1.3.6.1.2.1.1.4.0 = STRING: "it@example.org"
+.1.3.6.1.2.1.1.6.0 = STRING: "Uebungsraum"
+$ snmpwalk -v2c -c uebung -On 127.0.0.1:11161 1.3.6.1.2.1.2.2.1.2   (Schnittstellennamen, ifDescr, erste Zeile)
+.1.3.6.1.2.1.2.2.1.2.1 = STRING: "lo"
+$ snmpget -v2c -c falsch 127.0.0.1:11161 1.3.6.1.2.1.1.5.0
+Timeout: No Response from 127.0.0.1:11161.
+$ snmpget -v1 -c uebung 127.0.0.1:11161 1.3.6.1.2.1.1.5.0   (Version 1 mit richtiger Gemeinschaft)
+.1.3.6.1.2.1.1.5.0 = STRING: "lin-snmp01"
+
+## 2. Host mit SNMP-Schnittstelle (Version 2c, Gemeinschaft über Makro)
+Host switch01: Schnittstellentyp 2 (2 = SNMP), Version 2, Gemeinschaft {$SNMP_COMMUNITY}, Bulk 1
+
+## 3. SNMP-Items: OID, Datentyp, Vorverarbeitung (Änderung je Sekunde)
+switch01 sysname      = lin-snmp01
+switch01 syscontact   = it@example.org
+switch01 ifnumber ist eine ganze Zahl größer 0: ja
+inoctets[lo] (Änderung je Sekunde) ist eine Zahl größer oder gleich 0: ja
+
+## 4. Fehlerbilder: falsche Gemeinschaft und fehlende OID
+  switch02 (falsche Gemeinschaft), Fehler an der Schnittstelle: Timeout while connecting to "…".
+  switch01 (OID fehlt), Fehler am Item: No Such Object available on this agent at this OID
+Verfügbarkeit der SNMP-Schnittstellen (1 = verfügbar, 2 = nicht verfügbar):
+  switch01: 1
+  switch02: 2
+
+## 5. Mitgelieferte SNMP-Vorlage (Linux by SNMP): Entdeckungsregeln
+  Block devices discovery  (vfs.dev.discovery[snmp])
+  CPU discovery  (cpu.discovery[snmp])
+  EtherLike-MIB Discovery  (net.if.duplex.discovery)
+  Mounted filesystem discovery  (vfs.fs.discovery[snmp])
+  Network interfaces discovery  (net.if.discovery)
+
+## 6. SNMPv3 und Traps (NICHT ausgeführt)
+  SNMPv3 (Benutzername, Authentifizierung, Verschlüsselung) und SNMP-Traps wurden nicht getestet; Feldnamen und Optionen sind nicht bestätigt.

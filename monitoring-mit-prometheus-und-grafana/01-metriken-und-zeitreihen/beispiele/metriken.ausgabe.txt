@@ -1,0 +1,35 @@
+
+## 1. Eine Metrik im Textformat: HELP, TYPE und Messwerte (Auszug)
+# HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.
+# TYPE node_cpu_seconds_total counter
+node_cpu_seconds_total{cpu="0",mode="idle"} <WERT>
+node_cpu_seconds_total{cpu="0",mode="user"} <WERT>
+# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.
+# TYPE node_memory_MemTotal_bytes gauge
+node_memory_MemTotal_bytes 8.413835264e+09
+
+## 2. Metrikarten im gesamten Bestand (Anzahl je TYPE)
+  counter 9
+  gauge 90
+  summary 1
+
+## 3. Zähler (counter) wächst, Messwert (gauge) schwankt: zweimal lesen, 3 Sekunden Abstand
+Zähler idle (cpu 0): erster Wert größer 0: True | zweiter Wert nicht kleiner: True
+Anstieg in 3 s zwischen 0 und 3 Sekunden (ein Kern, höchstens 3 s Leerlauf): True
+Zähler zeigen erst durch rate() eine Geschwindigkeit, siehe Modul 3.
+
+## 4. Zeitreihen zählen: jede Kombination aus Namen und Labelwerten ist eine Reihe
+node_cpu_seconds_total: 16 Reihen = 2 Kerne x 8 Modi
+Rechenbeispiel: 50 Hosts x 4 Kerne x 8 Modi = 1600 Reihen allein für diese eine Metrik
+
+## 5. Der Prüfer promtool check metrics: Ausgabe des Exporters (Auszug) und eine absichtlich schlechte Metrik
+node_memory_AnonHugePages_bytes metric names should be written in 'snake_case' not 'camelCase'
+node_memory_AnonPages_bytes metric names should be written in 'snake_case' not 'camelCase'
+node_memory_CommitLimit_bytes metric names should be written in 'snake_case' not 'camelCase'
+... Beanstandungen insgesamt: 27, Rückgabecode 3 (0 = keine Beanstandung)
+Beispiel: auch der echte Exporter verletzt die Namensregel (camelCase) in Namen, die aus /proc/meminfo stammen.
+anfragen counter metrics should have "_total" suffix
+anfragen no help text
+speicherGB metric names should be written in 'snake_case' not 'camelCase'
+speicherGB no help text
+Rückgabecode 3

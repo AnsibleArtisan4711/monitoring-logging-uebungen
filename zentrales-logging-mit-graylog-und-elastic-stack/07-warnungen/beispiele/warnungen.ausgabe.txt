@@ -1,0 +1,36 @@
+
+## 1. Regeln als Daten (Name, Bedingung, Gruppierung, Schwelle, Zeitfenster, Sperrzeit)
+  Passwortraten: anzahl >= 10 in 60 s je ip, danach 600 s Sperrzeit, Schwere hoch
+  Fehlerwelle: anzahl >= 20 in 300 s je host, danach 600 s Sperrzeit, Schwere hoch
+  Portscan: verschieden:port >= 10 in 120 s je quelle, danach 600 s Sperrzeit, Schwere mittel
+
+## 2. Abspielen der Tagesdaten: Alarme mit Sperrzeit
+  03:10:42  mittel Portscan       10.18.0.77  (Wert 10)
+  14:02:12  hoch   Passwortraten  10.18.0.99  (Wert 10)
+  16:31:20  hoch   Fehlerwelle    srv01  (Wert 20)
+  Alarme gesamt: 3
+
+## 3. Ohne Sperrzeit: jede weitere Meldung innerhalb des Fensters löst erneut aus (Alarmflut)
+  mit Sperrzeit: 3 Alarme; ohne Sperrzeit: 178 Alarme
+    ohne Sperrzeit Fehlerwelle: 131
+    ohne Sperrzeit Passwortraten: 31
+    ohne Sperrzeit Portscan: 16
+
+## 4. Fehlalarme prüfen: einzelne Tippfehler und normale Anmeldungen lösen nichts aus
+  Passwortraten ohne die Daten von 10.18.0.99: 0 Alarme (erwartet 0)
+  Schwelle zu niedrig (2 Fehlschläge in 1 Stunde), wieder ohne 10.18.0.99: 5 Alarm(e) – Fehlalarme durch einfache Tippfehler
+
+## 5. Stille erkennen: längste Lücke ohne Ereignis je Rechner (Hinweis auf ausgefallenen Sammler oder Rechner)
+  fw01: längste Lücke 40.1 Minuten, beginnend um 18:41:47
+  srv01: längste Lücke 6.2 Minuten, beginnend um 07:33:47
+  srv02: längste Lücke 95.5 Minuten, beginnend um 02:10:01
+
+## 6. Test der Regelmaschine mit eigenen kleinen Ereignissen (Selbsttest)
+  OK     2 in 10 s: kein Alarm (ist 0, soll 0)
+  OK     3 in 10 s: ein Alarm (ist 1, soll 1)
+  OK     3 in 20 s: kein Alarm (ist 0, soll 0)
+  OK     3 von drei Adressen: kein Alarm (ist 0, soll 0)
+  OK     6 dicht beieinander: wegen Sperrzeit nur ein Alarm (ist 1, soll 1)
+
+## 7. Benachrichtigung im Graylog-Stil (NICHT ausgeführt; Begriffe aus Fachwissen, nicht bestätigt)
+  Eine „Ereignisdefinition“ besteht aus Bedingung (Suchanfrage, Schwelle, Zeitfenster), Gruppierung, Sperrzeit und Benachrichtigung (E-Mail, HTTP). Menünamen und Felder: nicht bestätigt.

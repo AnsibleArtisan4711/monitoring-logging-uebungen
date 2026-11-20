@@ -1,0 +1,23 @@
+
+## 1. Konfigurationen prüfen
+rsyslogd: End of config validation run. Bye.
+rsyslogd: End of config validation run. Bye.
+
+## 2. Meldungen über UDP an den Client: Filter lässt nur warning und schwerer durch
+Am Server angekommen: 2 von 4 gesendeten Meldungen (info und debug wurden gefiltert)
+{"programm":"webapp","severity":"err","nachricht":"Datenbank nicht erreichbar"}
+{"programm":"webapp","severity":"warning","nachricht":"Antwortzeit hoch"}
+
+## 3. Dateiüberwachung (imfile): Zeilen einer Anwendungsdatei werden gelesen und weitergeleitet
+app warning local5: Zeile A der Anwendung
+app warning local5: Zeile B der Anwendung
+
+## 4. Server fällt aus: der Client puffert in der Warteschlange und liefert nach dem Neustart nach
+Zeilen am Server während des Ausfalls: 0 neu
+Nach dem Neustart des Servers neu angekommen: 2
+Meldung 1 während des Ausfalls
+Meldung 2 während des Ausfalls
+
+## 5. Fehlerbild: falscher Zielport; nichts kommt an, der Client meldet es im Protokoll
+Neu am Server: 0
+Hinweis in der Ausgabe des Clients: 5 Zeile(n) mit Verbindungsproblem

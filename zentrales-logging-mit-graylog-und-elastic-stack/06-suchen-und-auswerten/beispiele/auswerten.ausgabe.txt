@@ -1,0 +1,58 @@
+
+## 1. Zählen: Ereignisse je Rechner und je Schweregrad (level)
+  srv01   2150
+  fw01     400
+  srv02    171
+  level 3: 169
+  level 5: 50
+  level 6: 2502
+
+## 2. Rangliste: Quelladressen der Firewall-Verweigerungen (Top 3)
+  10.18.0.77    25
+  10.18.0.37     5
+  10.18.0.40     4
+
+## 3. Verlauf: Ereignisse je Stunde als Balken (ein # = 25 Ereignisse) – Auffälligkeiten sichtbar machen
+  00 Uhr   38 #
+  01 Uhr   59 ##
+  02 Uhr   47 #
+  03 Uhr   91 ###
+  04 Uhr   54 ##
+  05 Uhr   57 ##
+  06 Uhr   50 ##
+  07 Uhr   55 ##
+  08 Uhr  158 ######
+  09 Uhr  150 ######
+  10 Uhr  180 #######
+  11 Uhr  206 ########
+  12 Uhr  180 #######
+  13 Uhr  181 #######
+  14 Uhr  225 #########
+  15 Uhr  190 #######
+  16 Uhr  318 ############
+  17 Uhr  161 ######
+  18 Uhr   56 ##
+  19 Uhr   48 #
+  20 Uhr   57 ##
+  21 Uhr   51 ##
+  22 Uhr   54 ##
+  23 Uhr   55 ##
+
+## 4. Portscan finden: Adressen, die in 2 Minuten mindestens 10 verschiedene Ziel-Ports ansprachen und verweigert wurden
+  10.18.0.77: 24 verschiedene Ports innerhalb von 2 Minuten (erste Zeit 03:10:00)
+  Adressen mit Verweigerungen insgesamt: 10
+
+## 5. Passwortraten: fehlgeschlagene Anmeldungen je Minute und Quelle (ab 10 pro Minute) und was danach geschah
+  10.18.0.99 um 14:02 Uhr: 40 Fehlschläge in der Minute; danach erfolgreiche Anmeldung von derselben Adresse: ja, 14:03:05 als ben
+
+## 6. Antwortzeiten: Median und 95. Perzentil je Stunde (nur Stunden mit p95 über 500 ms) und gesamt
+  gesamt: n=2150, Median 63 ms, p95 1466 ms
+  16 Uhr: n=293, Median 937 ms, p95 2772 ms
+
+## 7. Fehlerquote je Stunde (Anteil HTTP-Status ≥ 500) in der auffälligen Stunde
+  16 Uhr: 150 von 293 Anfragen = 51.2 %
+
+## 8. Fehlerbild: falscher Feldname liefert keine Fehlermeldung, nur leere Ergebnisse
+  richtig  (.status >= 500): 169 Treffer
+  falsch   (.stauts >= 500): 0 Treffer (kein Fehler, nur 0)
+  Gegenprüfung: Feldnamen der Webereignisse: bytes dauer_ms facility host ip level methode nachricht pfad programm status zeit 

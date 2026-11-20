@@ -1,0 +1,27 @@
+
+## 1. Ablauf (Modell): Ausfall von 10:10:00 bis 10:17:30, Auslöser 'Down länger als 60 s', Wiederholung alle 180 s
+  10:11:00  Stufe 1: Sensor ist Down
+  10:14:00  Wiederholung
+  10:17:00  Wiederholung
+  10:17:30  Entwarnung: Sensor ist wieder Up
+
+## 2. Kurzer Ausfall (45 s) löst nichts aus; mit Auslöser 0 s wird jede Störung gemeldet (keine Entwarnung ohne vorherige Meldung)
+  Auslöser 60 s: keine Nachricht
+  Auslöser  0 s: ['Stufe 1: Sensor ist Down', 'Entwarnung: Sensor ist wieder Up']
+
+## 3. Eskalation: Stufe 1 nach 60 s an das Team, Stufe 2 nach 900 s an die Leitung (Ausfall 20 Minuten)
+  +   60 s nach Ausfallbeginn  Stufe 1: Sensor ist Down
+  +  900 s nach Ausfallbeginn  Stufe 2: weiter Down (Eskalation)
+  + 1200 s nach Ausfallbeginn  Entwarnung: Sensor ist wieder Up
+
+## 4. Zustellung echt: Webhook-Aufruf mit JSON an den lokalen Empfänger (Inhalt mit Platzhaltern wie im Lehrplan beschrieben; Platzhalternamen nicht bestätigt)
+HTTP 200
+{"sensor":"HTTP srv01","status":"Down","nachricht":"Statuscode 500"}
+
+## 5. Empfänger nicht erreichbar: der Versand schlägt fehl (curl-Fehlercode 7); die Meldung geht verloren, wenn niemand Fehlversuche überwacht
+$ curl -s -m 2 -o /dev/null -X POST -d x http://127.0.0.1:18299/
+Rückgabewert: 7
+
+## 6. Regel für Sinn und Zahl: Benachrichtigungen je Ausfall bei 40 Sensoren eines Geräts - ohne und mit Abhängigkeit (Modul 6)
+  ohne Abhängigkeit: 40 Sensoren melden Down  ->  40 Nachrichten
+  mit Abhängigkeit (Ping als Eltern-Sensor): 1 Nachricht, 39 Sensoren pausiert

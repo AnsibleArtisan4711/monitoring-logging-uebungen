@@ -1,0 +1,31 @@
+
+## 1. Ein Skript mit gültiger XML-Antwort und zwei Kanälen (Plattenbelegung in Prozent, Anzahl Dateien); bestätigt sind prtg, result, channel, value, unit, float, limitmaxerror, text, error - limitmaxwarning und limitmode sind nicht bestätigt
+xmllint-Rückgabe: 0 (0 = wohlgeformt)
+Kanäle: 2, zweiter Kanal: Dateien
+
+## 2. Dieselbe Antwort als JSON (Python), mit Gleitkommawert (float=1) und Einheit
+{"channel":"Temperatur","value":21.5,"float":1}
+Prüfung: mindestens ein Kanal -> OK
+
+## 3. Fehlerantwort: error=1 und text (so meldet ein Skript, dass die Messung selbst scheiterte)
+<prtg>
+  <error>1</error>
+  <text>Verzeichnis fehlt</text>
+</prtg>
+
+## 4. Prüfer für eigene Skripte: Kanalnamen eindeutig, value ist eine Zahl, mindestens ein Kanal (Python)
+  gut      -> OK
+  doppelt  -> FEHLER Kanalnamen doppelt
+  text     -> FEHLER value keine Zahl: 'viel'
+  leer     -> FEHLER kein Kanal
+  kaputt   -> FEHLER nicht lesbar: ParseError
+
+## 5. Zeitlimit: ein Skript, das zu lange braucht, wird abgebrochen (hier 'timeout 1' als Ersatz für die Zeitüberschreitung des Sensors)
+Rückgabewert: 124 (124 = Zeitlimit überschritten; der Sensor meldet dann einen Fehler)
+
+## 6. Ablage und Aufruf (Text): wo das Skript liegen muss
+  Windows-Probe : Skriptdatei im Unterordner \Custom Sensors\EXEXML des PRTG-Programmordners; erlaubte Endungen .bat .cmd .exe .ps1 .vbs (Stand 20.11.2026)
+  Linux-Ziel    : Sensor "SSH Script Advanced", Skript auf dem Ziel unter /var/prtg/scriptsxml (Stand 20.11.2026); gleiche XML/JSON-Ausgabe
+  Cluster       : Datei auf jedem Knoten ablegen; Zeitlimit höchstens 900 s
+  Fehlersuche   : Option "Ergebnis speichern" aktivieren, dann die Rohausgabe lesen
+  Menünamen in PRTG: nicht bestätigt

@@ -1,0 +1,34 @@
+
+## 1. Streams als Regeldatei: Sicherheit, Web-Fehler (Fehler 500 und höher), Firewall-Verweigerungen
+  Sicherheit: any, 2 Regeln
+  Web-Fehler: all, 2 Regeln
+  Firewall-Aus: all, 2 Regeln, aus Default entfernt
+
+## 2. Nachrichten auf die Streams verteilen (rohe Nachrichten: nur zeit, host, programm, level, nachricht)
+  Nachrichten gesamt: 2721
+  Stream Sicherheit   : 221
+  Stream Web-Fehler   : 169
+  Stream Firewall-Aus : 350
+  Stream Default      : 2371
+  Summe der Stream-Zuordnungen: 3111 (eine Nachricht kann in mehreren Streams liegen)
+
+## 3. Pipeline: Stufe 0 zerlegt den Text in Felder, Stufe 1 klassifiziert und leitet um, Stufe 2 verwirft Rauschen
+  Nachrichten rein: 2721, verworfen: 88, weiter: 2633
+  Regel nginx-felder         Treffer: 2150
+  Regel rauschen-verwerfen   Treffer: 88
+  Regel ssh-fehlschlag       Treffer: 70
+  Regel ssh-felder           Treffer: 171
+  Regel web-500              Treffer: 169
+  Umgeleitet: Sicherheit=70, Web-Fehler=169
+  Beispiel nach der Pipeline: {'host': 'srv02', 'benutzer': 'cara', 'ip': '10.18.0.34', 'ereignis': 'anmeldung_fehler', '_streams': ['Sicherheit']}
+
+## 4. Reihenfolge zählt: dieselbe Klassifizierungsregel in Stufe 0 (vor der Zerlegung) findet das Feld noch nicht
+  Richtige Reihenfolge: 70 Anmeldefehler erkannt; Klassifizierung vor der Zerlegung: 0
+
+## 5. Dieselbe Regel in der Regelsprache von Graylog (NICHT ausgeführt; Schreibweise aus Fachwissen, nicht bestätigt)
+  rule "ssh-fehlschlag"
+  when has_field("ergebnis") && to_string($message.ergebnis) == "Failed"
+  then
+    set_field("ereignis", "anmeldung_fehler");
+    route_to_stream("Sicherheit");
+  end

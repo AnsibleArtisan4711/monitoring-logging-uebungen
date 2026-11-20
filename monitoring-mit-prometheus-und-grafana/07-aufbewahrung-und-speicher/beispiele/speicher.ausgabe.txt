@@ -1,0 +1,51 @@
+
+## 1. Blöcke der Zeitreihendatenbank (promtool tsdb list)
+BLOCK ULID  MIN TIME  MAX TIME  DURATION  NUM SAMPLES  NUM CHUNKS  NUM SERIES  SIZE
+<ULID>  1793000400000  1793001585001  19m45.001s  2320  29  29  11983
+<ULID>  1793001600000  1793007600001  1h40m0.001s  11629  116  29  42391
+
+## 2. Analyse: Reihen, Samples, größte Metriken nach Reihenzahl (promtool tsdb analyze)
+Block ID: …
+Duration: 1h40m0.001s
+Series: 29
+Label names: 9
+Postings (unique label pairs): 33
+Postings entries (total label pairs): 113
+Highest cardinality metric names:
+6 http_request_duration_seconds_bucket
+6 node_cpu_seconds_total
+3 http_requests_total
+3 up
+2 node_filesystem_avail_bytes
+
+## 3. Recording Rule: teure Abfrage vorberechnen
+  SUCCESS: 1 rules found
+
+Unit Testing:  regeln_test.yml
+  SUCCESS
+
+
+## 4. Aufbewahrung konfigurieren: Zeit und Größe (Startoptionen), Wirkung im laufenden Prometheus
+storage.agent.retention.max-time = 0s
+storage.agent.retention.min-time = 0s
+storage.tsdb.retention = 0s
+storage.tsdb.retention.size = 1GiB
+storage.tsdb.retention.time = 30d
+Prometheus löscht ganze Blöcke, sobald ihr Ende älter als die Aufbewahrungszeit ist oder die Gesamtgröße die Grenze überschreitet.
+
+## 5. Speicherbedarf abschätzen
+Reihen im Kopfblock: 0
+Beispielrechnung: 1500 Reihen, alle 15 s, 15 Tage, ~2 Byte/Sample
+  Samples: 129.600.000
+  Speicher: 0.26 GB (Faustwert, Kompression und Index nicht enthalten)
+Tatsächliche Größe der erfundenen Daten (29 Reihen, 2 Stunden): unter 2 MiB
+
+## 6. Schnappschuss über die Admin-API
+success
+Schnappschüsse: 1
+Blöcke im Schnappschuss: 2
+
+## 7. Reihen löschen (Admin-API) und Platz freigeben
+DELETE HTTP 204
+Reihen http_requests_total vorher: 3, nachher: 0
+clean_tombstones HTTP 204

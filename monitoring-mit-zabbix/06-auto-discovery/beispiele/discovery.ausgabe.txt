@@ -1,0 +1,27 @@
+
+## 1. Das Entdeckungsskript liefert JSON mit dem Makro {#QUEUE}; Prüfung mit jq
+{"data":[{"{#QUEUE}":"archiv"},{"{#QUEUE}":"druck"},{"{#QUEUE}":"mail"}]}
+gültiges JSON, 3 Einträge: archiv, druck, mail
+Wert eines Elements (uebung.queue[mail]): 5
+
+
+## 2. Host, Entdeckungsregel mit Filter (archiv ausschließen), Item- und Trigger-Prototyp
+Regel: Warteschlangen entdecken, Schlüssel uebung.queues.discovery, Intervall 5s
+Filter: {#QUEUE} Operator 9 (9 = passt nicht auf) ^archiv$
+Prototypen: 1 Item-Prototyp, 1 Trigger-Prototyp
+
+## 3. Entdeckung läuft: erzeugte Items und Trigger (archiv ist durch den Filter ausgeschlossen)
+Entdeckte Items: uebung.queue[druck], uebung.queue[mail]
+Entdeckte Trigger: Warteschlange druck über 100; Warteschlange mail über 100
+Wert von uebung.queue[mail] = 5
+
+## 4. Neue Warteschlange erscheint (Datei anlegen), Trigger-Prototyp wirkt (Wert 150 bei Grenze 100)
+Entdeckte Items: uebung.queue[druck], uebung.queue[mail], uebung.queue[scan]
+Problem: Warteschlange mail über 100
+
+## 5. Verschwundene Ressource: Datei druck.txt entfernen, Item wird sofort gelöscht (Einstellung „sofort löschen“)
+Entdeckte Items: uebung.queue[mail], uebung.queue[scan]
+
+## 6. Fehlerbild: Skript liefert ungültiges JSON; die Regel wird nicht unterstützt
+Fehler der Regel: Invalid discovery rule value: cannot parse as a valid JSON object: invalid object name at: 'data: kaputt'
+Bereits entdeckte Items bleiben bestehen: uebung.queue[mail], uebung.queue[scan]

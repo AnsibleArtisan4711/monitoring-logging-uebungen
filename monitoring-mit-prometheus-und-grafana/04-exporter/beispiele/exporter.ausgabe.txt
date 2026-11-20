@@ -1,0 +1,41 @@
+
+## 1. Textfile-Collector: ein Sicherungsskript schreibt eine .prom-Datei (erst unter anderem Namen, dann umbenennen)
+sicherung.prom
+$ promtool check metrics < sicherung.prom
+Rückgabecode 0
+
+## 2. Der Exporter liefert die Datei aus (Auszug von /metrics)
+node_textfile_scrape_error 0
+sicherung_dauer_sekunden{job="dateien"} 312
+sicherung_letzter_erfolg_zeitstempel_sekunden{job="dateien"} 1.793e+09
+
+## 3. Eigener Exporter: Textformat prüfen
+# HELP uebung_abrufe_total Anzahl der Abrufe dieses Exporters.
+# TYPE uebung_abrufe_total counter
+uebung_abrufe_total <Zahl der Abrufe, steigt>
+# HELP uebung_warteschlange_laenge Elemente in der Warteschlange (fester Beispielwert).
+# TYPE uebung_warteschlange_laenge gauge
+uebung_warteschlange_laenge{queue="mail"} 7
+uebung_warteschlange_laenge{queue="druck"} 0
+$ promtool check metrics
+Rückgabecode 0
+
+## 4. Prometheus sammelt beide Ziele; Abfrage des Alters der letzten Sicherung (Stand: Zeitstempel in der Datei ist fest, das Alter wächst)
+ SUCCESS: /tmp/p18/p.yml is valid prometheus config file syntax
+instance=127.0.0.1:19100,job=node	1
+instance=127.0.0.1:19101,job=eigener	1
+instance=127.0.0.1:19101,job=eigener,queue=druck	0
+instance=127.0.0.1:19101,job=eigener,queue=mail	7
+Alter der Sicherung größer als 1 Tag (86400 s)? Ergebnis (1 = ja):
+exported_job=dateien,instance=127.0.0.1:19100,job=node	1
+Zähler des eigenen Exporters wächst; rate() über 4 s größer als 0 (1 = ja):
+instance=127.0.0.1:19101,job=eigener	1
+
+## 5. windows_exporter (NICHT ausgeführt): so würde das Ziel in der Konfiguration stehen; die Prüfung betrifft nur die Syntax der Prometheus-Datei
+scrape_configs:
+  - job_name: windows
+    static_configs:
+      - targets: ['win01:9182']      # Standardport laut Fachwissen, nicht bestätigt
+        labels: {rolle: dateiserver}
+ SUCCESS: /tmp/p18/win.yml is valid prometheus config file syntax
+Die Sammler (collectors) von windows_exporter, zum Beispiel cpu, logical_disk, memory, net, os, service, werden in dessen Aufruf oder Konfigurationsdatei ausgewählt; Namen und Optionen wurden NICHT geprüft.

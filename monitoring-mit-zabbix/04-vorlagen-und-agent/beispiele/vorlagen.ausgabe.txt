@@ -1,0 +1,38 @@
+
+## 1. Vorlage mit Item, Makro und Trigger anlegen
+Vorlage Uebung Linux Basis: Items uebung.warteschlange, uebung.kib; Trigger "Warteschlange über {$QUEUE_MAX}"; Makro {$QUEUE_MAX}=100
+
+## 2. Vorlage mit einem Host verknüpfen: Items und Trigger werden geerbt
+  Item uebung.kib geerbt von Vorlagen-Item ja
+  Item uebung.warteschlange geerbt von Vorlagen-Item ja
+  Trigger am Host: Warteschlange über 100
+
+## 3. Vorverarbeitung: Multiplikator 1024 macht aus 2048 KiB den Wert in Byte
+Rohwert in der Datei: 2048, gespeicherter Wert: 2097152
+
+## 4. Makro auf Host-Ebene überschreibt das Makro der Vorlage
+Warteschlange 50, Grenze aus der Vorlage 100: Trigger-Wert = 0 (0 = OK)
+Host-Makro {$QUEUE_MAX}=30: Trigger-Wert = 1 (Problem) bei gleichem Messwert 50
+Aufgelöster Name des Problems: Warteschlange über 30
+
+## 5. Aktive Prüfung: der Agent holt seine Liste und sendet Werte selbst (Item-Typ 7, Hostname muss passen)
+agent.hostname (aktiv) = lin01
+
+## 6. Trapper-Item und zabbix_sender: Werte von außen einliefern
+$ zabbix_sender -z 127.0.0.1 -p 11051 -s lin01 -k uebung.manuell -o 42
+Response from "127.0.0.1:11051": "processed: 1; failed: 0; total: 1
+sent: 1; skipped: 0; total: 1
+gespeicherter Wert: 42
+$ zabbix_sender ... -s unbekannt -k uebung.manuell -o 7
+Response from "127.0.0.1:11051": "processed: 0; failed: 1; total: 1
+
+## 7. Mitgelieferte Vorlagen (Inhalt der frisch installierten Datenbank)
+  Linux by Zabbix agent: 43 Items, 15 Trigger, 3 Entdeckungsregeln
+  Windows by Zabbix agent: 34 Items, 13 Trigger, 4 Entdeckungsregeln
+  Linux by SNMP: 33 Items, 10 Trigger, 5 Entdeckungsregeln
+  ICMP Ping: 3 Items, 3 Trigger, 0 Entdeckungsregeln
+
+## 8. Windows-Agent (NICHT ausgeführt): so würde der Host in Zabbix aussehen
+  Host win01, Schnittstelle Agent, Port 10050 (Standardport nach Fachwissen, nicht bestätigt), Vorlage "Windows by Zabbix agent".
+  In der Agentenkonfiguration unter Windows: Server=<Adresse des Zabbix-Servers>, ServerActive=<Adresse>, Hostname=win01.
+  Dienst "Zabbix Agent" starten; Namen von Dienst und Installationspfad nicht geprüft.

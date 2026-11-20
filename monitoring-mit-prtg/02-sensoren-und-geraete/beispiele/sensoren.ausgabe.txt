@@ -1,0 +1,39 @@
+
+## 1. Sensorarten nach Zweck (Modell; Namen der PRTG-Sensoren sind nicht bestätigt)
+  Erreichbarkeit  : Ping                  -> ist das Gerät da?
+  Dienst          : Port (TCP)            -> antwortet der Dienst?
+  Anwendung       : HTTP                  -> richtiger Statuscode, Antwortzeit?
+  Werte           : SNMP, WMI, SSH        -> CPU, Speicher, Platte, Schnittstellen (Modul 3)
+  Eigene Werte    : Skript-Sensor         -> Modul 7
+
+## 2. Echte Prüfungen gegen 127.0.0.1: Port offen, HTTP-Statuscode, falscher Port, falscher Pfad
+  Port 18201                     -> True
+  Port 18299 (nichts dahinter)   -> False
+  HTTP /                         -> 200
+  HTTP /gibt-es-nicht            -> 404
+
+## 3. Statuslogik (Modell): Messwert gegen Grenzen, Antwortzeit 120 ms Warnung ab 100, Fehler ab 500
+    40 ms -> Up
+   100 ms -> Up
+   101 ms -> Warning
+   500 ms -> Warning
+   501 ms -> Down
+  keine Antwort -> Down
+
+## 4. Ein Fehlversuch genügt nicht: 'Down (teilweise)', bis zwei Messungen in Folge fehlschlagen (Modell, einstellbar)
+  t=  0 s  gemessen Up    gemeldet Up
+  t= 60 s  gemessen Down  gemeldet Down (teilweise)
+  t=120 s  gemessen Up    gemeldet Up
+  t=180 s  gemessen Down  gemeldet Down (teilweise)
+  t=240 s  gemessen Down  gemeldet Down
+  t=300 s  gemessen Down  gemeldet Down
+  t=360 s  gemessen Up    gemeldet Up
+
+## 5. Sensorbudget: Geräte mit Sensoren gegen die Grenze der Gratisstufe (100, Stand 20.11.2026)
+  srv01   16 Sensoren
+  srv02   13 Sensoren
+  fw01    21 Sensoren
+  sw01    49 Sensoren
+  sw02    49 Sensoren
+  gesamt 148 von 100 -> ÜBER DER GRENZE um 48
+  nur die 6 wichtigen Ports je Switch: 64 Sensoren

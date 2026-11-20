@@ -1,0 +1,42 @@
+
+## 1. Selbstüberwachung: interne Items (Typ 5) auf einem Host ohne Schnittstelle
+zabbix[queue] (Werte im Rückstand) = 0
+zabbix[wcache,values] (gespeicherte Werte seit Start) ist eine Zahl größer 0: ja
+zabbix[rcache,buffer,pfree] (freier Konfigurationscache) über 50 %: ja
+zabbix[process,poller,avg,busy] unter 100 %: ja
+
+## 2. Erwartete Werte je Sekunde (NVPS) aus den Intervallen der Items berechnen
+Intervalle der Beispiel-Items: 1m, 2s, 5s
+NVPS der drei Items zusammen: 0.72  (= 1/60 + 1/5 + 1/2)
+
+## 3. Housekeeping: Aufbewahrungszeiten lesen und ändern
+Vorher: Verlauf 31d (Modus 1), Trends 365d, Trigger-Ereignisse 365d
+Nachher: Verlauf 7d, Trends 90d
+Fehlerbild: ungültige Angabe „abc“ für die Aufbewahrungszeit:
+  API-FEHLER housekeeping.update: Invalid parameter "/hk_history": a time unit is expected.
+Runtime control command was forwarded successfully
+Protokoll: 1 Meldung(en) 'executing housekeeper'
+
+## 4. Sicherung der Konfiguration (ohne Messwert-Tabellen) mit pg_dump; Größe und Inhalt
+Sicherungsdatei vorhanden und nicht leer: ja
+Größe unter 10 MiB: ja
+Inhaltsverzeichnis des Dumps enthält die Tabelle hosts: 1
+
+## 5. Wiederherstellung in einer neuen Datenbank und Vergleich
+Hosts und Vorlagen: Original 358, Wiederherstellung 358; Items: 18395 / 18395; gleich: ja
+Host zbx-intern in der Wiederherstellung: zbx-intern
+Messwerte (history) in der Wiederherstellung: 0 (bewusst nicht gesichert)
+
+## 6. Zweiter Server auf der wiederhergestellten Datenbank (anderer Port): startet er?
+current database version (mandatory/optional): 07000000/07000030
+server #0 started [main process]
+
+## 7. Abschlussprojekt – Abnahmeprüfung (je Prüfpunkt OK/FEHLER)
+OK      Server antwortet auf der API
+OK      Agent erreichbar (zabbix_get)
+OK      Interne Items liefern Werte
+OK      Housekeeping geändert (7d)
+OK      Sicherung vorhanden
+OK      Wiederherstellung vollständig
+OK      Zweiter Server startet
+FEHLER  absichtlich falsch: Port 1

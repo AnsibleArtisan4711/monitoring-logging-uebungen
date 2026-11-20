@@ -1,0 +1,38 @@
+
+## 1. Gesundheit prüfen: /-/healthy, /-/ready, Version
+/-/healthy -> Prometheus Server is Healthy.
+/-/ready -> Prometheus Server is Ready.
+Version <Paketstand>, Go <Version>
+
+## 2. Konfiguration ändern und im Betrieb neu laden (ohne Neustart)
+Ziele vorher: 1
+ SUCCESS: /tmp/p18/p.yml is valid prometheus config file syntax
+POST /-/reload HTTP 200
+Ziele nachher: 2
+
+## 3. Fehlerhafte Konfiguration: Reload wird abgelehnt, alte Konfiguration bleibt
+  FAILED: parsing YAML file /tmp/p18/p.yml: yaml: line 8: did not find expected ',' or '}'
+promtool-Rückgabecode: 1
+POST /-/reload HTTP 500
+Ziele weiterhin: 2
+
+## 4. Zugriffsschutz: web.yml mit Basic Auth (bcrypt-Hash) und Test
+/tmp/p18/web.yml SUCCESS
+ohne Anmeldung: HTTP 401
+falsches Passwort: HTTP 401
+richtiges Passwort: HTTP 200
+
+## 5. Sicherung: Schnappschuss kopieren; Wiederherstellung: neues Prometheus auf der Kopie
+success
+Archiv enthält Blöcke mit Chunks: ja (6 Einträge)
+Wiederhergestellt: Reihen up aus der erfundenen Messreihe (Soll 3): 3
+
+## 6. Abschlussprojekt - Abnahmeprüfung des Mini-Stacks (je Prüfpunkt OK/FEHLER)
+OK      Prometheus bereit
+OK      node_exporter-Ziel up
+OK      Konfiguration gültig
+OK      Admin-API Schnappschuss
+OK      Sicherungsarchiv vorhanden
+OK      Wiederherstellung antwortet
+OK      Zugriffsschutz konfiguriert
+FEHLER  absichtlich falsch: Port 1

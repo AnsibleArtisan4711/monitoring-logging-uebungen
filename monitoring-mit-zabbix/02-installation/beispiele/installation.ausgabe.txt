@@ -1,0 +1,68 @@
+
+## 1. Datenbank anlegen und Schema einspielen (schema.sql, images.sql, data.sql in dieser Reihenfolge)
+schema.sql eingespielt
+images.sql eingespielt
+data.sql eingespielt
+Tabellen: 203
+Datenbankversion (Tabelle dbversion): 7000000 7000030
+
+## 2. Fehlerbild: Server mit falschem Datenbankanschluss (Port 15999) starten (Auszug des Protokolls)
+Starting Zabbix Server. Zabbix 7.0.32 (revision …).
+[Z3001] connection to database 'zbxinst' failed: [0] connection to server at "127.0.0.1", port 15999 failed: Connection refused
+Server beendet
+
+## 3. Richtige Konfiguration: Server starten, Startmeldungen im Protokoll
+Starting Zabbix Server. Zabbix 7.0.32 (revision …).
+current database version (mandatory/optional): 07000000/07000030
+server #0 started [main process]
+Konfiguration (ohne Kennwort):
+  LogFile=/tmp/p17/server.log
+  PidFile=/tmp/p17/server.pid
+  SocketDir=/tmp/p17
+  ListenPort=11051
+  DBHost=127.0.0.1
+  DBPort=15432
+  DBName=zbxinst
+  DBUser=zabbix
+  StartPollers=2
+  StartPingers=1
+  StartTrappers=2
+  StartDiscoverers=1
+  CacheSize=32M
+  HistoryCacheSize=16M
+  CacheUpdateFrequency=5
+  Timeout=3
+  UnreachablePeriod=5
+  UnreachableDelay=2
+  UnavailableDelay=5
+  AlertScriptsPath=/tmp/p17/alertscripts
+
+## 4. Agent konfigurieren und mit dem Testschalter -t prüfen (ohne Dienst zu starten)
+agent.ping                                    [u|1]
+agent.hostname                                [s|lin01]
+kein.schluessel                               [m|ZBX_NOTSUPPORTED] [Unsupported item key.]
+
+## 5. Frontend: PHP-Module, Konfigurationsdatei und Anmeldung über die API
+PHP-Modul pgsql: vorhanden
+PHP-Modul bcmath: vorhanden
+PHP-Modul mbstring: vorhanden
+PHP-Modul gd: vorhanden
+PHP-Modul xml: vorhanden
+PHP-Modul curl: vorhanden
+Anmeldung mit falschem Kennwort: Incorrect user name or password or account is temporarily blocked.
+Anmeldung mit Standardkennwort: erfolgreich (Token mit 32 Zeichen)  -> Standardkennwort sofort ändern!
+Kennwort geändert: ja
+altes Kennwort danach: Incorrect user name or password or account is temporarily blocked.
+
+## 6. Laufzeitbefehle des Servers (-R): Konfiguration neu laden, Protokollstufe ändern
+Runtime control command was forwarded successfully
+Runtime control command was forwarded successfully
+zabbix_server [PID]: Cannot perform runtime control command: unknown option "kein_befehl"
+
+## 7. Installation aus Paketen (NICHT ausgeführt; Paketnamen und Ablauf aus Fachwissen, nicht bestätigt)
+  1. Paket mit der Repository-Konfiguration von zabbix.com herunterladen und installieren (Version und Betriebssystem wählen).
+  2. apt update
+  3. apt install zabbix-server-pgsql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
+  4. Datenbank und Benutzer anlegen, Schema aus den SQL-Skripten des Pakets einspielen.
+  5. DBPassword in /etc/zabbix/zabbix_server.conf eintragen; Dienste mit systemctl starten und aktivieren.
+  6. Frontend im Browser aufrufen (Einrichtungsassistent), Standardkennwort ändern.

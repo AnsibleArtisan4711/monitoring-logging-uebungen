@@ -1,0 +1,42 @@
+
+## 1. SNMP v2c lesen: Name, Ort, Kontakt (Community 'uebung-lesen' ist ein Übungswert)
+$ snmpget -v2c -c uebung-lesen -Oqv 127.0.0.1:11162 1.3.6.1.2.1.1.5.0
+"srv-snmp01"
+$ snmpget -v2c -c uebung-lesen -Oqv 127.0.0.1:11162 1.3.6.1.2.1.1.6.0
+"Uebungsraum"
+$ snmpget -v2c -c uebung-lesen -Oqv 127.0.0.1:11162 1.3.6.1.2.1.1.4.0
+"it@example.org"
+
+## 2. Falsche Community: der Agent schweigt (Zeitüberschreitung); unbekannter Benutzer bei SNMP v3: sofortige Fehlermeldung
+$ snmpget -v2c -c falsch -t1 -r0 -Oqv 127.0.0.1:11162 1.3.6.1.2.1.1.5.0
+Timeout: No Response from 127.0.0.1:11162.
+$ snmpget -v3 -l noAuthNoPriv -u gibtsnicht -t1 -r0 -Oqv 127.0.0.1:11162 1.3.6.1.2.1.1.5.0
+snmpget: Unknown user name
+
+## 3. Eine OID, die es nicht gibt, und eine Tabelle laufen lassen (snmpwalk auf die Systemgruppe, Zeilenzahl)
+$ snmpget -v2c -c uebung-lesen 127.0.0.1:11162 1.3.6.1.2.1.99.9.9.0
+iso.3.6.1.2.1.99.9.9.0 = No Such Object available on this agent at this OID
+Zeilen der Systemgruppe: 37
+
+## 4. Beschreibbar ist nicht nötig: ein Schreibversuch mit der Lese-Community scheitert
+$ snmpset -v2c -c uebung-lesen -t1 -r0 127.0.0.1:11162 1.3.6.1.2.1.1.5.0 s neuername
+Error in packet.
+Reason: noAccess
+Failed object: iso.3.6.1.2.1.1.5.0
+
+
+## 5. Die Werte, die ein SNMP-Sensor liest: Speicher und Last aus dem Agenten (Namen statt Nummern mit -Os)
+laLoadInt.1 = INTEGER: <Last x100, schwankt>
+hrSystemProcesses.0 = Gauge32: <Zahl der Prozesse, schwankt>
+
+## 6. SSH-Sensor (Modell): PRTG führt Befehle auf dem Ziel aus; dieselben Befehle lokal, damit Sie die Ausgabe kennen
+$ cat /proc/loadavg | awk "{print \$1}"  -> Zahl mit Dezimalpunkt:
+ja
+$ df -P / | tail -1 | awk "{print \$5}"  -> endet auf %:
+ja
+
+## 7. WMI (nicht ausgeführt): was auf dem Windows-Ziel stimmen muss
+  - Konto mit Rechten für WMI/DCOM auf dem Ziel, Anmeldedaten im Gerät oder in der Gruppe hinterlegt
+  - Namensauflösung vom PRTG-Server zum Ziel, RPC-Endpunktzuordnung (TCP 135) und dynamische RPC-Ports in der Firewall
+  - Dienst "Windows-Verwaltungsinstrumentation" läuft; Test von der Probe aus mit PowerShell: Get-CimInstance Win32_OperatingSystem -ComputerName win01
+  - Menünamen und Fehlertexte in PRTG: nicht bestätigt

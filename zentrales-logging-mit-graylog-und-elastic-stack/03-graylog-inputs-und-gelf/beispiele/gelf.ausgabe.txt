@@ -1,0 +1,31 @@
+
+## 1. Eine gültige GELF-Nachricht (Pflichtfelder: version, host, short_message; Zusatzfelder mit Unterstrich)
+{"version": "1.1", "host": "srv02", "short_message": "Failed password for ben from 10.18.0.99", "timestamp": 1793019720.5, "level": 6, "_programm": "sshd", "_benutzer": "ben", "_ip": "10.18.0.99"}
+Fehler: keine
+
+## 2. Ungültige Nachrichten und die Fehlerliste des Prüfers
+  ohne short_message             -> short_message fehlt oder ist leer
+  falsche Version                -> version muss "1.1" sein
+  Level 9                        -> level muss eine Zahl von 0 bis 7 sein
+  Zusatzfeld ohne Unterstrich    -> Zusatzfeld "benutzer" muss mit Unterstrich beginnen
+  Zusatzfeld _id                 -> Zusatzfeld "_id" ist nicht erlaubt
+  Zusatzfeld mit Liste           -> Zusatzfeld "_liste" darf nur Text oder Zahl enthalten
+
+## 3. Größe der Datagramme: unkomprimiert, gzip, zlib (eine längere Nachricht mit Wiederholungen)
+  roh 3603 Byte, gzip 178 Byte, zlib 166 Byte; gzip kleiner als ein Fünftel: True
+  Rückweg gzip gleich Original: True | zlib: True
+
+## 4. Ein Modell-Input über UDP (127.0.0.1:12201): einfache, komprimierte und zerlegte Datagramme; ein verlorener Teil
+  große Nachricht: 4170 Byte in 3 Teilen (Teil 0 beginnt mit 1e0f)
+  angekommen: ['klein', 'klein', 'klein', 'gross']
+  unvollständige Nachrichten im Speicher: 1
+  große Nachricht unverändert: True
+
+## 5. Eine Syslog-Zeile (Modul 2) und ein erfundenes Windows-Ereignis nach GELF umsetzen
+  {"version": "1.1", "host": "lin01", "short_message": "Datenbank nicht erreichbar", "level": 3, "_programm": "webapp", "_facility": "local4"} -> gültig
+  {"version": "1.1", "host": "win01", "short_message": "Ereignis 4625 im Kanal Security", "level": 6, "_ereignis_id": 4625, "_kanal": "Security", "_benutzer": "ben", "_ip": "10.18.0.99", "_anmeldetyp": 3} -> gültig
+
+## 6. Aufbau von Graylog laut Fachwissen (NICHT ausgeführt, Versionen und Lizenzmodell mit Stand prüfen)
+  Graylog-Server (Eingänge, Streams, Pipelines, Weboberfläche) + MongoDB (Konfiguration, Benutzer) + Suchindex (OpenSearch oder Elasticsearch, Nachrichten).
+  Eingänge (Inputs): unter anderem GELF (UDP/TCP), Syslog, Beats. Standardports und Menünamen: nicht bestätigt.
+  Lizenzmodell und unterstützte Versionen der Bausteine ändern sich: vor einem Einsatz auf der Herstellerseite mit Datum prüfen (hier nicht geprüft).

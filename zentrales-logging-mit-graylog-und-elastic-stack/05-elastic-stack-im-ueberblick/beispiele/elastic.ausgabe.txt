@@ -1,0 +1,57 @@
+
+## 1. Index mit Zuordnung (Mapping): Feldtypen keyword (exakt), text (zerlegt), long (Zahl), date
+  Dokumente im Index: 2721
+  Typen: zeit=date, host=keyword, programm=keyword, level=long, facility=keyword, nachricht=text, ip=keyword …
+
+## 2. Abfragen: match (Text), term (exakt), range (Bereich), bool (Kombination)
+  Volltext: Wörter 'failed password' (ODER-Verknüpfung der Wörter)
+    Abfrage: {"query":{"match":{"nachricht":"failed password"}}}
+    Treffer: 171
+    Beispiel: Accepted password for cara from 10.18.0.36 port 40362 ssh2
+  Volltext mit UND
+    Abfrage: {"query":{"match":{"nachricht":{"query":"failed password","operator":"and"}}}}
+    Treffer: 70
+  Exakt: programm = sshd
+    Abfrage: {"query":{"term":{"programm":"sshd"}}}
+    Treffer: 171
+  Fehlerbild: term auf einem Textfeld mit Großbuchstaben findet nichts
+    Abfrage: {"query":{"term":{"nachricht":"Failed"}}}
+    Treffer: 0
+  Dasselbe mit kleinem Wort (so steht es im Index)
+    Abfrage: {"query":{"term":{"nachricht":"failed"}}}
+    Treffer: 70
+  Bereich: status >= 500
+    Abfrage: {"query":{"range":{"status":{"gte":500}}}}
+    Treffer: 169
+  Kombination: nginx, Status >= 500, zwischen 16:30 und 16:40
+    Abfrage: {"query":{"bool":{"filter":[{"term":{"programm":"nginx"}},{"range":{"status":{"gte":500}}},{"range":{"zeit":{"gte":"2026-10-26T16:30:00+01:00","lte":"2026-10-26T16:40:00+01:00"}}}]}}}
+    Treffer: 150
+
+## 3. Aggregationen: Häufigkeiten, Mittelwert, Stundenverlauf
+  Rechner nach Anzahl
+    Abfrage: {"size":0,"aggs":{"je_host":{"terms":{"field":"host"}}}}
+    Treffer: 2721
+    Aggregation je_host: [{"key":"srv01","doc_count":2150},{"key":"fw01","doc_count":400},{"key":"srv02","doc_count":171}]
+  Quellen der fehlgeschlagenen Anmeldungen (Top 3)
+    Abfrage: {"query":{"term":{"ereignis":"anmeldung_fehler"}},"aggs":{"top_ip":{"terms":{"field":"ip","size":3}}}}
+    Treffer: 70
+    Aggregation top_ip: [{"key":"10.18.0.99","doc_count":40},{"key":"10.18.0.32","doc_count":6},{"key":"10.18.0.36","doc_count":5}]
+  Mittlere Antwortzeit aller Webanfragen (Millisekunden)
+    Abfrage: {"query":{"term":{"programm":"nginx"}},"aggs":{"mittel_ms":{"avg":{"field":"dauer_ms"}}}}
+    Treffer: 2150
+    Aggregation mittel_ms: {"value":191.3}
+  Fehler 500 je Stunde (nur Stunden mit Treffern)
+    Abfrage: {"query":{"term":{"status":500}},"aggs":{"je_stunde":{"date_histogram":{"field":"zeit","fixed_interval":"1h"}}}}
+    Treffer: 169
+    Aggregation je_stunde: [{"key":"2026-10-26T01:00","doc_count":1},{"key":"2026-10-26T02:00","doc_count":1},{"key":"2026-10-26T03:00","doc_count":1},{"key":"2026-10-26T06:00","doc_count":1},{"key":"2026-10-26T08:00","doc_count":2},{"key":"2026-10-26T09:00","doc_count":1},{"key":"2026-10-26T11:00","doc_count":1},{"key":"2026-10-26T12:00","doc_count":2},{"key":"2026-10-26T14:00","doc_count":1},{"key":"2026-10-26T15:00","doc_count":3},{"key":"2026-10-26T16:00","doc_count":150},{"key":"2026-10-26T17:00","doc_count":1},{"key":"2026-10-26T18:00","doc_count":2},{"key":"2026-10-26T19:00","doc_count":1},{"key":"2026-10-26T20:00","doc_count":1}]
+
+## 4. Gegenprobe mit jq (unabhängig vom Modell)
+  Status >= 500:          169
+  sshd-Fehlschläge:       70
+  Top-IP der Fehlschläge: 10.18.0.99 (40)
+
+## 5. Bausteine des Elastic Stack und Beispielkonfigurationen (NICHT ausgeführt; Schreibweise aus Fachwissen, nicht bestätigt)
+  Beats (leichte Sammler auf den Rechnern) -> Logstash (Aufbereitung, optional) -> Elasticsearch (Index und Suche) -> Kibana (Oberfläche).
+  Lizenzmodell und Versionsstand ändern sich; vor einem Einsatz mit Datum auf der Herstellerseite prüfen (hier nicht geprüft).
+  Beispiel (Filebeat, YAML):            filebeat.inputs: [{type: filestream, id: web, paths: [/var/log/nginx/access.log]}]
+  Beispiel (Logstash-Pipeline):         input { beats { port => 5044 } }  filter { grok { match => { "message" => "%{COMBINEDAPACHELOG}" } } }  output { elasticsearch { hosts => ["http://127.0.0.1:9200"] } }

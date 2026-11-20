@@ -1,0 +1,39 @@
+
+## 1. Provisioning: Datenquelle und Dashboard-Ordner als Dateien (Grafana liest sie beim Start)
+datasources/prometheus.yml -> gültiges YAML, Schlüssel: ['apiVersion', 'datasources']
+dashboards/dashboards.yml -> gültiges YAML, Schlüssel: ['apiVersion', 'providers']
+
+## 2. Dashboard als JSON mit Variable $instance und drei Panels
+server.json: gültiges JSON
+Panels:
+  1 timeseries	CPU-Auslastung in %
+  2 gauge	Speicher belegt in %
+  3 stat	Freier Platz auf /
+Variable: instance = label_values(node_memory_MemTotal_bytes, instance)
+
+## 3. Variablenabfrage und Panel-Abfragen gegen das echte Prometheus (Grafana ersetzt $instance und $__rate_interval)
+Werte der Variable $instance (label_values entspricht dieser API-Abfrage):
+  srv01:9100
+  srv02:9100
+Panel 1 (CPU-Auslastung in %) mit instance=srv01:9100:
+  100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle",instance="srv01:9100"}[5m])))
+  Wert: (ohne Labels)	17.829
+Panel 2 (Speicher belegt in %) mit instance=srv01:9100:
+  100 * (1 - node_memory_MemAvailable_bytes{instance="srv01:9100"} / node_memory_MemTotal_bytes{instance="srv01:9100"})
+  Wert: instance=srv01:9100,job=node	44.929
+Panel 3 (Freier Platz auf /) mit instance=srv01:9100:
+  node_filesystem_avail_bytes{mountpoint="/",instance="srv01:9100"}
+  Wert: instance=srv01:9100,job=node,mountpoint=/	59270548684
+
+## 4. Anderer Wert der Variable: srv02 (Platte füllt sich, CPU steigt)
+Panel 1 (CPU-Auslastung in %): 84.66
+Panel 2 (Speicher belegt in %): 89.872
+Panel 3 (Freier Platz auf /): 19756849561
+
+## 5. Fehlerbild: Variable falsch geschrieben, Panel bleibt leer ("No data")
+instance="srv99:9100": leere Antwort (keine Reihe)
+
+## 6. Schwellwerte des Gauge-Panels aus dem JSON gelesen
+ab -∞: green
+ab 70: orange
+ab 90: red
